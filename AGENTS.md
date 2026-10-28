@@ -2,43 +2,59 @@
 
 ## What this project is
 
-A single-page restaurant booking prototype (`index.html` + Netlify Identity helper
-`auth.js`). There is **no build step, no package.json and no server code**:
-`netlify.toml` publishes the static folder `deploy-6ae1ec6b5f4c161d122f9211`.
+A single-page restaurant booking site: `site/index.html` (all UI and client logic)
+plus `site/auth.js` (accounts client). It is served by `server/server.js`, a
+dependency-free Node HTTP server that also provides the JSON API.
+
+There is **no build step, no package.json and no npm dependencies**. Netlify
+(`netlify.toml`, Identity, Functions) is no longer used: hosting, accounts and
+bookings all come from this repository now.
 
 ## Running it in the sandbox
 
-`docker-compose.base44.yml` runs one `nginx:alpine` service that serves the publish
-folder straight from the bind-mounted checkout on host port 3000. Because the files
-are mounted (not baked into an image) an edit to `index.html`/`auth.js` shows up on
-the next page load — there is no watcher or compiler to wait for, but a full preview
-reload is needed if the browser cached the page.
+```bash
+docker compose -f docker-compose.base44.yml up -d --build
+```
 
-No environment variables or secrets are required to boot.
+One `node:22-alpine` service runs `node --watch server/server.js` with `./site` and
+`./server` bind-mounted read-only, so edits restart the process automatically. The
+data file lives in the `kennies-data` volume at `/app/data/db.json` — never delete
+that volume to "reset" dependencies; it holds accounts and bookings.
 
-## Netlify-only pieces that do not exist locally
+`docker compose -f docker-compose.base44.yml down` keeps the volume; add `-v` only
+when you really mean to wipe every account and booking.
 
-The frontend talks to Netlify platform features that are not part of this repository,
-so they 404 in the sandbox (`/.netlify/identity/*` and `/api/*`):
+## Accounts and API
 
-- `/.netlify/identity` — Netlify Identity. Login, signup, password reset and every
-  signed-in screen (My Bookings, Bookings Desk, Admin) need it. A failed login leaves
-  an **empty** error box because the thrown `AuthError` carries no message.
-- `/api/reservations` and `/api/users` — Netlify Functions that are not in this
-  checkout. "Confirm Booking & Payment", the bookings desk and the admin user list
-  cannot work without them.
+`server/server.js` stores everything in one JSON file and exposes:
 
-So a local run covers: home, menu + category filters, cart/order totals, reservation
-form and the payment step up to the login prompt.
+- `POST /api/auth/signup|login|logout`, `GET /api/auth/me`, `POST /api/auth/password`
+- `POST /api/auth/forgot`, `POST /api/auth/verify` — password reset. No mail provider
+  is configured, so the reset link is printed in the server log
+  (`[password-reset] email: /?recovery_token=…`); staff can copy it to the customer.
+- `GET|POST /api/reservations`, `PATCH /api/reservations/:id` — customers only see and
+  cancel their own bookings; manager/admin see and update all.
+- `GET /api/users`, `PATCH /api/users/:id` — admin only; a role change applies at the
+  user's next request because the server re-reads the account on every call.
+
+A bootstrap admin is seeded on first boot from `ADMIN_EMAIL` / `ADMIN_PASSWORD`
+(defaults `admin@kennies.local` / `kennies123`, set in `docker-compose.base44.yml`).
+Change both before the site is public — signup only ever creates customers, and roles
+can only be granted from the Admin page.
+
+Sessions are an HttpOnly same-origin cookie, so serve the site and API from one origin
+(as this compose file does). Behind the preview proxy the cookie gets `Secure` from
+`X-Forwarded-Proto`.
 
 ## How to verify
 
 ```bash
-docker compose -f docker-compose.base44.yml up -d --build
-docker compose -f docker-compose.base44.yml ps          # web should be healthy
-curl -sI http://localhost:3000/ | head -1               # 200
-curl -sI http://localhost:3000/auth.js | grep Content-Type   # application/javascript
+docker compose -f docker-compose.base44.yml ps                 # web healthy
+curl -sI http://localhost:3000/ | head -1                      # 200
+curl -s http://localhost:3000/api/auth/me                      # {"user":null}
+curl -s -o /dev/null -w '%{http_code}\n' http://localhost:3000/img/lava-cake.jpg
 ```
 
-Then in the browser: Home → Menu (filter a category) → `+ Add` → Order → Continue to
-Reservation → fill name/email/date → Continue to Payment.
+Then in the browser: sign up at *Log in → Create account*, add menu items, continue to
+payment and confirm a booking, open *My Bookings*, then log in as the admin to check
+the Bookings Desk and Admin pages.

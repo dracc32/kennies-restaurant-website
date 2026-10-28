@@ -1,0 +1,2 @@
+# local server data (accounts, bookings) when running outside Docker
+data/

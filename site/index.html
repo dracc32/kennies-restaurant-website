@@ -1832,7 +1832,10 @@ async function confirmPayment(){
         ...reservation,
         seating:reservation.seat,
         paymentMethod:pm.value,
-        items:cart
+        items:cart.map(x => {
+          let f = foods.find(a => a.id === x.id);
+          return { name:f.n, price:f.p, qty:x.q };
+        })
       })
     });
   }catch(err){
@@ -1921,7 +1924,7 @@ function authErrorText(err){
   if(A && err instanceof A.AuthError){
     if(err.status === 401) return 'Invalid email or password.';
     if(err.status === 403) return 'New signups are currently closed.';
-    if(err.status === 422) return 'Please check your email and use a password of at least 6 characters.';
+    if(err.status === 422) return err.message || 'Please check your email and use a password of at least 6 characters.';
     return err.message;
   }
   return err.message || 'Something went wrong. Please try again.';
@@ -2082,12 +2085,8 @@ function doSignup(e){
   e.preventDefault();
   withAuthBtn('Creating account…', async () => {
     let user = await KAuth.signup(semail.value.trim(), spass.value, { full_name:sname.value.trim() });
-    if(user.emailVerified){
-      setUser(user);
-      goAfterLogin();
-    }else{
-      setMsg('authMsg', 'Almost there! Check your email to confirm your account, then log in.', 'ok');
-    }
+    setUser(user);
+    goAfterLogin();
   });
 }
 

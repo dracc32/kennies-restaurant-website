@@ -1,26 +1,39 @@
 # Base44 sandbox environment for this repository.
 #
-# The project is a static site: netlify.toml publishes
-# `deploy-6ae1ec6b5f4c161d122f9211`, which contains index.html and auth.js.
-# There is no build step, so nginx serves those files straight from the
-# bind-mounted checkout — editing them is visible on the next page load.
+# The site and its API are served by one small Node process (server/server.js):
+# static files from ./site plus /api/auth, /api/reservations and /api/users.
+# Nothing here depends on Netlify Identity or Netlify Functions.
 services:
   web:
-    image: nginx:alpine
+    image: node:22-alpine
+    working_dir: /app
+    command: ["node", "--watch", "/app/server/server.js"]
     ports:
-      - "3000:80"
+      - "3000:3000"
     volumes:
-      - ./deploy-6ae1ec6b5f4c161d122f9211:/usr/share/nginx/html:ro
+      - ./site:/app/site:ro
+      - ./server:/app/server:ro
+      - kennies-data:/app/data
     environment:
+      - PORT=3000
+      - HOST=0.0.0.0
+      - SITE_DIR=/app/site
+      - DATA_DIR=/app/data
       - BASE44_PREVIEW_MODE
+      # Bootstrap admin account, change these to your own before going live.
+      - ADMIN_EMAIL=${ADMIN_EMAIL:-admin@kennies.local}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-kennies123}
     restart: on-failure
     labels:
       base44.project: Kennies Booking
       base44.kind: web
       base44.port: "3000"
     healthcheck:
-      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1/index.html"]
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:3000/"]
       interval: 10s
       timeout: 3s
       retries: 3
-      start_period: 5s
+      start_period: 10s
+
+volumes:
+  kennies-data:
