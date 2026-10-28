@@ -1,0 +1,2323 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Kennies — Restaurant Booking</title>
+<script type="module" src="/auth.js"></script>
+
+<style>
+:root{
+  --bg:#171411;
+  --surface:#211c18;
+  --ink:#f4eee8;
+  --muted:#b3a79e;
+  --accent:#b85f3d;
+  --accent2:#d9a66b;
+  --line:#3a3029;
+  --good:#6fa17d;
+  --shadow:0 14px 35px #00000045
+}
+
+*{
+  box-sizing:border-box
+}
+
+body{
+  margin:0;
+  font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;
+  background:var(--bg);
+  color:var(--ink)
+}
+
+button,input,select{
+  font:inherit
+}
+
+.app{
+  min-height:100vh;
+  background:var(--bg)
+}
+
+header{
+  position:sticky;
+  top:0;
+  z-index:10;
+  background:#211c18ee;
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--line)
+}
+
+.nav{
+  max-width:1180px;
+  margin:auto;
+  padding:16px 22px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:20px
+}
+
+.brand{
+  font-family:Georgia,serif;
+  font-size:26px;
+  font-weight:700
+}
+
+.brand span{
+  color:var(--accent)
+}
+
+nav{
+  display:flex;
+  gap:6px;
+  flex-wrap:wrap
+}
+
+nav button{
+  border:0;
+  background:transparent;
+  padding:9px 13px;
+  border-radius:10px;
+  color:var(--muted);
+  cursor:pointer
+}
+
+nav button.active,
+nav button:hover{
+  background:#342a24;
+  color:#e2a078;
+  font-weight:700
+}
+
+.cart{
+  position:relative;
+  border:0;
+  background:var(--accent);
+  color:white;
+  padding:10px 14px;
+  border-radius:10px;
+  cursor:pointer
+}
+
+.badge{
+  background:#f4eee8;
+  color:#7e402c;
+  border-radius:99px;
+  padding:1px 6px;
+  margin-left:5px;
+  font-size:12px
+}
+
+main{
+  max-width:1180px;
+  margin:auto;
+  padding:34px 22px 70px
+}
+
+.hero{
+  background:linear-gradient(125deg,#21140f,#6e3023);
+  color:white;
+  border-radius:24px;
+  padding:42px;
+  display:grid;
+  grid-template-columns:1.3fr .7fr;
+  gap:30px;
+  box-shadow:var(--shadow);
+  margin-bottom:30px
+}
+
+.hero h1{
+  font:700 clamp(38px,6vw,66px)/.98 Georgia,serif;
+  margin:8px 0 16px
+}
+
+.hero p{
+  color:#e4d2c7;
+  max-width:600px;
+  font-size:17px;
+  line-height:1.6
+}
+
+.eyebrow{
+  text-transform:uppercase;
+  letter-spacing:2px;
+  font-size:12px;
+  font-weight:800;
+  color:var(--accent2)
+}
+
+.hero-card{
+  background:#ffffff12;
+  border:1px solid #ffffff28;
+  border-radius:18px;
+  padding:22px;
+  align-self:end
+}
+
+.hero-card b{
+  font-size:22px
+}
+
+.cta{
+  display:inline-block;
+  border:0;
+  border-radius:11px;
+  padding:12px 18px;
+  background:#c88d5f;
+  color:#24150f;
+  font-weight:800;
+  cursor:pointer;
+  margin-top:8px
+}
+
+.section-title{
+  display:flex;
+  justify-content:space-between;
+  align-items:end;
+  margin:28px 0 15px
+}
+
+.section-title h2{
+  font:700 30px Georgia,serif;
+  margin:0
+}
+
+.section-title p{
+  color:var(--muted);
+  margin:0
+}
+
+.filters{
+  display:flex;
+  gap:8px;
+  overflow:auto;
+  margin-bottom:16px
+}
+
+.filter{
+  border:1px solid var(--line);
+  background:var(--surface);
+  padding:9px 13px;
+  border-radius:99px;
+  cursor:pointer;
+  color:var(--ink)
+}
+
+.filter.active{
+  background:#f4eee8;
+  color:#241d18
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:18px
+}
+
+.card{
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:17px;
+  overflow:hidden;
+  box-shadow:0 4px 15px #00000024
+}
+
+.food-img{
+  height:150px;
+  display:grid;
+  place-items:center;
+  font-size:55px;
+  background:linear-gradient(135deg,#3b3028,#61493a)
+}
+
+.card-body{
+  padding:16px
+}
+
+.card h3{
+  margin:0 0 6px;
+  font-size:18px
+}
+
+.desc{
+  color:var(--muted);
+  font-size:13px;
+  line-height:1.45;
+  min-height:38px
+}
+
+.row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px
+}
+
+.price{
+  font-weight:800;
+  color:#d47a54
+}
+
+.add{
+  border:0;
+  background:var(--accent);
+  color:white;
+  border-radius:9px;
+  padding:8px 11px;
+  cursor:pointer
+}
+
+.empty{
+  padding:40px;
+  text-align:center;
+  color:var(--muted);
+  background:var(--surface);
+  border:1px dashed var(--line);
+  border-radius:16px
+}
+
+.panel{
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:24px;
+  box-shadow:var(--shadow);
+  margin-bottom:20px
+}
+
+.formgrid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:15px
+}
+
+.field label{
+  display:block;
+  font-size:12px;
+  font-weight:800;
+  margin-bottom:6px;
+  color:var(--muted)
+}
+
+.field input,
+.field select{
+  width:100%;
+  padding:12px;
+  border:1px solid var(--line);
+  border-radius:10px;
+  background:#2a231e;
+  color:var(--ink);
+  outline:none
+}
+
+.field input::placeholder{
+  color:#82766c
+}
+
+.field input:focus,
+.field select:focus{
+  border-color:var(--accent)
+}
+
+.full{
+  grid-column:1/-1
+}
+
+.primary{
+  border:0;
+  background:var(--accent);
+  color:white;
+  border-radius:11px;
+  padding:12px 18px;
+  font-weight:800;
+  cursor:pointer
+}
+
+.summary{
+  background:#2b211b;
+  border-radius:14px;
+  padding:15px;
+  margin-top:18px
+}
+
+.itemline{
+  display:flex;
+  justify-content:space-between;
+  padding:9px 0;
+  border-bottom:1px solid var(--line)
+}
+
+.itemline:last-child{
+  border:0
+}
+
+.qty{
+  display:flex;
+  align-items:center;
+  gap:7px
+}
+
+.qty button{
+  width:26px;
+  height:26px;
+  border:1px solid var(--line);
+  background:#2a231e;
+  color:var(--ink);
+  border-radius:7px;
+  cursor:pointer
+}
+
+.total{
+  font-size:19px;
+  font-weight:800;
+  text-align:right;
+  padding-top:12px
+}
+
+.steps{
+  display:flex;
+  gap:8px;
+  margin-bottom:20px
+}
+
+.step{
+  flex:1;
+  padding:10px;
+  text-align:center;
+  border-radius:10px;
+  background:#332a24;
+  color:var(--muted);
+  font-size:13px;
+  font-weight:700
+}
+
+.step.active{
+  background:var(--accent);
+  color:white
+}
+
+.success{
+  padding:28px;
+  text-align:center
+}
+
+.success .icon{
+  font-size:50px
+}
+
+.success h2{
+  font:700 32px Georgia,serif
+}
+
+footer{
+  text-align:center;
+  color:var(--muted);
+  font-size:13px;
+  padding:25px;
+  border-top:1px solid var(--line)
+}
+
+.header-actions{
+  display:flex;
+  align-items:center;
+  gap:8px
+}
+
+.account{
+  border:1px solid var(--line);
+  background:transparent;
+  color:var(--ink);
+  padding:9px 13px;
+  border-radius:10px;
+  cursor:pointer
+}
+
+.account small{
+  color:var(--accent2);
+  text-transform:uppercase;
+  letter-spacing:1px;
+  font-size:10px;
+  font-weight:800;
+  margin-left:6px
+}
+
+.auth-wrap{
+  max-width:460px;
+  margin:20px auto
+}
+
+.tabs{
+  display:flex;
+  gap:6px;
+  margin-bottom:18px
+}
+
+.tabs button{
+  flex:1;
+  border:1px solid var(--line);
+  background:#2a231e;
+  color:var(--muted);
+  padding:10px;
+  border-radius:10px;
+  cursor:pointer;
+  font-weight:700
+}
+
+.tabs button.active{
+  background:var(--accent);
+  border-color:var(--accent);
+  color:white
+}
+
+.stack{
+  display:grid;
+  gap:14px
+}
+
+.link{
+  border:0;
+  background:none;
+  color:var(--accent2);
+  cursor:pointer;
+  padding:0;
+  text-decoration:underline
+}
+
+.msg{
+  padding:11px 13px;
+  border-radius:10px;
+  font-size:14px;
+  display:none
+}
+
+.msg.show{
+  display:block
+}
+
+.msg.error{
+  background:#5a2620;
+  color:#ffd9cf
+}
+
+.msg.ok{
+  background:#24402d;
+  color:#d6f2dd
+}
+
+.stats{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:14px;
+  margin-bottom:20px
+}
+
+.stat{
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:16px
+}
+
+.stat .label{
+  color:var(--muted);
+  font-size:12px;
+  font-weight:800;
+  text-transform:uppercase;
+  letter-spacing:1px
+}
+
+.stat .value{
+  font:700 28px Georgia,serif;
+  margin-top:6px
+}
+
+.table-wrap{
+  overflow:auto
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:14px
+}
+
+th,td{
+  text-align:left;
+  padding:11px 10px;
+  border-bottom:1px solid var(--line);
+  vertical-align:top
+}
+
+th{
+  color:var(--muted);
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:1px
+}
+
+td select{
+  padding:7px;
+  border:1px solid var(--line);
+  border-radius:8px;
+  background:#2a231e;
+  color:var(--ink)
+}
+
+.pill{
+  display:inline-block;
+  padding:3px 9px;
+  border-radius:99px;
+  font-size:12px;
+  font-weight:700;
+  background:#332a24;
+  color:var(--accent2);
+  text-transform:capitalize
+}
+
+.pill.confirmed,.pill.seated,.pill.completed{
+  background:#24402d;
+  color:#bfe5c9
+}
+
+.pill.cancelled{
+  background:#4a2420;
+  color:#f2c0b4
+}
+
+.ghost{
+  border:1px solid var(--line);
+  background:transparent;
+  color:var(--ink);
+  border-radius:9px;
+  padding:7px 11px;
+  cursor:pointer
+}
+
+@media(max-width:800px){
+  .stats{
+    grid-template-columns:1fr 1fr
+  }
+
+  .hero{
+    grid-template-columns:1fr;
+    padding:28px
+  }
+
+  .grid{
+    grid-template-columns:1fr 1fr
+  }
+
+  .formgrid{
+    grid-template-columns:1fr
+  }
+}
+
+@media(max-width:520px){
+  .nav{
+    align-items:flex-start;
+    flex-wrap:wrap
+  }
+
+  .grid{
+    grid-template-columns:1fr
+  }
+
+  main{
+    padding:22px 14px
+  }
+
+  .hero h1{
+    font-size:42px
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<header>
+  <div class="nav">
+
+    <div class="brand">
+      Kennies
+    </div>
+
+    <nav id="nav"></nav>
+
+    <div class="header-actions">
+
+      <button class="account" id="accountBtn" onclick="show(currentUser ? 'account' : 'login')">
+        Log in
+      </button>
+
+      <button class="cart" onclick="show('order')">
+        Order
+        <span class="badge" id="cartCount">0</span>
+      </button>
+
+    </div>
+
+  </div>
+</header>
+
+<main id="main"></main>
+
+<footer>
+  HCI Restaurant Booking Prototype · Kennies · For academic demonstration
+</footer>
+
+</div>
+
+<script>
+
+const foods = [
+
+{
+  id:1,
+  n:'Truffle Cream Pasta',
+  c:'Pasta',
+  p:295,
+  e:'🍝',
+  d:'Silky cream sauce, parmesan and truffle oil.'
+},
+
+{
+  id:2,
+  n:'Chicken Parmigiana',
+  c:'Mains',
+  p:345,
+  e:'🍗',
+  d:'Crispy chicken, tomato basil sauce and cheese.'
+},
+
+{
+  id:3,
+  n:'Garlic Butter Shrimp',
+  c:'Mains',
+  p:365,
+  e:'🍤',
+  d:'Sauteed shrimp with garlic butter and herbs.'
+},
+
+{
+  id:4,
+  n:'Margherita Pizza',
+  c:'Pizza',
+  p:320,
+  e:'🍕',
+  d:'Tomato, fresh mozzarella and basil.'
+},
+
+{
+  id:5,
+  n:'Caesar Salad',
+  c:'Salads',
+  p:210,
+  e:'🥗',
+  d:'Crisp greens, parmesan, croutons and dressing.'
+},
+
+{
+  id:6,
+  n:'Chocolate Lava Cake',
+  c:'Dessert',
+  p:180,
+  e:'🍫',
+  d:'Warm chocolate cake with a molten center.'
+}
+
+
+];
+
+let cart = JSON.parse(
+  localStorage.getItem('savoreCart') || '[]'
+);
+
+let reservation = {};
+let filter = 'All';
+let currentUser = null;
+let afterLogin = null;
+let pendingInviteToken = null;
+let bookings = [];
+let bookingFilter = 'all';
+let staffUsers = [];
+
+const STATUSES = ['pending','confirmed','seated','completed','cancelled'];
+
+
+function esc(v){
+  return String(v ?? '').replace(/[&<>"']/g, c => ({
+    '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'
+  })[c]);
+}
+
+
+function roleOf(user){
+  let roles = (user && (user.roles || user.appMetadata?.roles)) || [];
+  if(roles.includes('admin')) return 'admin';
+  if(roles.includes('manager')) return 'manager';
+  return 'customer';
+}
+
+
+async function api(path, options = {}){
+  let res = await fetch(path, {
+    ...options,
+    headers:{ 'Content-Type':'application/json', ...(options.headers || {}) }
+  });
+  let data = await res.json().catch(() => ({}));
+  if(!res.ok) throw new Error(data.error || 'Something went wrong. Please try again.');
+  return data;
+}
+
+
+function money(n){
+  return '₱' + n.toLocaleString('en-PH');
+}
+
+
+function save(){
+
+  localStorage.setItem(
+    'savoreCart',
+    JSON.stringify(cart)
+  );
+
+  document.getElementById('cartCount').textContent =
+    cart.reduce((a,x)=>a+x.q,0);
+}
+
+
+function show(page){
+
+  let m = document.getElementById('main');
+
+  document.querySelectorAll('nav button')
+    .forEach(b =>
+      b.classList.toggle(
+        'active',
+        b.dataset.page === page
+      )
+    );
+
+  if(page === 'home') home();
+  if(page === 'menu') menu();
+  if(page === 'order') order();
+  if(page === 'reserve') reserve();
+  if(page === 'payment') payment();
+  if(page === 'login') loginPage();
+  if(page === 'account') account();
+  if(page === 'manager') managerPage();
+  if(page === 'admin') adminPage();
+
+}
+
+
+function home(){
+
+  document.getElementById('main').innerHTML = `
+
+    <section class="hero">
+
+      <div>
+
+        <div class="eyebrow">
+          Modern dining · warm hospitality
+        </div>
+
+        <h1>
+          A table worth<br>
+          remembering.
+        </h1>
+
+        <p>
+          Explore our signature menu, build your order,
+          reserve a table and complete payment in one
+          simple flow.
+        </p>
+
+        <button class="cta" onclick="show('reserve')">
+          Reserve a Table →
+        </button>
+
+      </div>
+
+      <div class="hero-card">
+
+        <div class="eyebrow">
+          Tonight at Kennies
+        </div>
+
+        <b>
+          Fresh. Cozy. Delicious.
+        </b>
+
+        <p>
+          Open daily · 10:00 AM – 10:00 PM
+        </p>
+
+      </div>
+
+    </section>
+
+
+    <div class="section-title">
+
+      <div>
+
+        <h2>
+          Popular picks
+        </h2>
+
+        <p>
+          Customer favorites from the kitchen.
+        </p>
+
+      </div>
+
+      <button class="primary" onclick="show('menu')">
+        View Full Menu
+      </button>
+
+    </div>
+
+
+    <div class="grid">
+
+      ${foods.slice(0,3).map(foodCard).join('')}
+
+    </div>
+
+  `;
+}
+
+
+function foodCard(f){
+
+  return `
+
+    <article class="card">
+
+      <div class="food-img">
+        ${f.e}
+      </div>
+
+      <div class="card-body">
+
+        <h3>
+          ${f.n}
+        </h3>
+
+        <div class="desc">
+          ${f.d}
+        </div>
+
+        <div class="row">
+
+          <span class="price">
+            ${money(f.p)}
+          </span>
+
+          <button class="add" onclick="add(${f.id})">
+            + Add
+          </button>
+
+        </div>
+
+      </div>
+
+    </article>
+
+  `;
+}
+
+
+function menu(){
+
+  document.getElementById('main').innerHTML = `
+
+    <div class="section-title">
+
+      <div>
+
+        <h2>
+          Our Menu
+        </h2>
+
+        <p>
+          Choose what you would like to enjoy.
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <div class="filters">
+
+      ${[
+        'All',
+        'Pasta',
+        'Mains',
+        'Pizza',
+        'Salads',
+        'Dessert'
+      ].map(x => `
+
+        <button
+          class="filter ${filter === x ? 'active' : ''}"
+          onclick="filter='${x}';menu()"
+        >
+          ${x}
+        </button>
+
+      `).join('')}
+
+    </div>
+
+
+    <div class="grid">
+
+      ${
+        foods
+          .filter(f => filter === 'All' || f.c === filter)
+          .map(foodCard)
+          .join('')
+      }
+
+    </div>
+
+  `;
+}
+
+
+function add(id){
+
+  let x = cart.find(a => a.id === id);
+
+  if(x)
+    x.q++;
+
+  else
+    cart.push({
+      id,
+      q:1
+    });
+
+  save();
+
+  show('order');
+}
+
+
+function change(id,d){
+
+  let x = cart.find(a => a.id === id);
+
+  if(!x)
+    return;
+
+  x.q += d;
+
+  if(x.q <= 0)
+    cart = cart.filter(a => a.id !== id);
+
+  save();
+
+  order();
+}
+
+
+function order(){
+
+  let total =
+    cart.reduce(
+      (a,x) =>
+        a + foods.find(f => f.id === x.id).p * x.q,
+      0
+    );
+
+  document.getElementById('main').innerHTML = `
+
+    <div class="section-title">
+
+      <div>
+
+        <h2>
+          Your Order
+        </h2>
+
+        <p>
+          Review your selected dishes before reservation or payment.
+        </p>
+
+      </div>
+
+      <button class="primary" onclick="show('menu')">
+        + Add Items
+      </button>
+
+    </div>
+
+
+    <div class="panel">
+
+      ${
+        cart.length
+
+        ?
+
+        cart.map(x => {
+
+          let f = foods.find(a => a.id === x.id);
+
+          return `
+
+            <div class="itemline">
+
+              <div>
+
+                <b>
+                  ${f.n}
+                </b>
+
+                <div class="desc">
+                  ${money(f.p)} each
+                </div>
+
+              </div>
+
+
+              <div class="qty">
+
+                <button onclick="change(${f.id},-1)">
+                  −
+                </button>
+
+                <b>
+                  ${x.q}
+                </b>
+
+                <button onclick="change(${f.id},1)">
+                  +
+                </button>
+
+                <strong>
+                  ${money(f.p * x.q)}
+                </strong>
+
+              </div>
+
+            </div>
+
+          `;
+
+        }).join('')
+
+        +
+
+        `
+
+          <div class="total">
+            Total: ${money(total)}
+          </div>
+
+
+          <div
+            style="
+              display:flex;
+              justify-content:flex-end;
+              gap:10px;
+              margin-top:15px
+            "
+          >
+
+            <button
+              class="primary"
+              onclick="show('reserve')"
+            >
+              Continue to Reservation →
+            </button>
+
+          </div>
+
+        `
+
+        :
+
+        `
+
+          <div class="empty">
+
+            <h3>
+              Your order is empty
+            </h3>
+
+            <p>
+              Add something delicious from the menu.
+            </p>
+
+            <button
+              class="primary"
+              onclick="show('menu')"
+            >
+              Browse Menu
+            </button>
+
+          </div>
+
+        `
+
+      }
+
+    </div>
+
+  `;
+}
+
+
+function reserve(){
+
+  document.getElementById('main').innerHTML = `
+
+    <div class="section-title">
+
+      <div>
+
+        <h2>
+          Reserve a Table
+        </h2>
+
+        <p>
+          Choose your date, time and party size.
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <div class="panel">
+
+      <div class="formgrid">
+
+        <div class="field">
+
+          <label>
+            FULL NAME
+          </label>
+
+          <input
+            id="rname"
+            placeholder="Juan Dela Cruz"
+            value="${esc(reservation.name || currentUser?.name || currentUser?.userMetadata?.full_name || '')}"
+          >
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            EMAIL
+          </label>
+
+          <input
+            id="remail"
+            type="email"
+            placeholder="juan@email.com"
+            value="${esc(reservation.email || currentUser?.email || '')}"
+          >
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            DATE
+          </label>
+
+          <input
+            id="rdate"
+            type="date"
+          >
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            TIME
+          </label>
+
+          <select id="rtime">
+
+            <option>
+              11:00 AM
+            </option>
+
+            <option>
+              12:30 PM
+            </option>
+
+            <option>
+              2:00 PM
+            </option>
+
+            <option>
+              5:30 PM
+            </option>
+
+            <option>
+              7:00 PM
+            </option>
+
+            <option>
+              8:30 PM
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            GUESTS
+          </label>
+
+          <select id="rguests">
+
+            <option>
+              1 Guest
+            </option>
+
+            <option selected>
+              2 Guests
+            </option>
+
+            <option>
+              3 Guests
+            </option>
+
+            <option>
+              4 Guests
+            </option>
+
+            <option>
+              5 Guests
+            </option>
+
+            <option>
+              6+ Guests
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            SEATING
+          </label>
+
+          <select id="rseat">
+
+            <option>
+              Indoor
+            </option>
+
+            <option>
+              Window
+            </option>
+
+            <option>
+              Outdoor
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <div class="field full">
+
+          <label>
+            SPECIAL REQUEST (OPTIONAL)
+          </label>
+
+          <input
+            id="rnote"
+            placeholder="Birthday, accessibility request, etc."
+          >
+
+        </div>
+
+      </div>
+
+
+      <button
+        class="primary"
+        style="margin-top:20px"
+        onclick="continueReserve()"
+      >
+        Continue to Payment →
+      </button>
+
+    </div>
+
+  `;
+
+  document.getElementById('rdate').min =
+    new Date().toISOString().slice(0,10);
+}
+
+
+function continueReserve(){
+
+  let name = rname.value.trim();
+  let email = remail.value.trim();
+  let date = rdate.value;
+
+  if(!name || !email || !date){
+
+    alert(
+      'Please complete your name, email and date.'
+    );
+
+    return;
+  }
+
+  reservation = {
+
+    name,
+    email,
+    date,
+    time:rtime.value,
+    guests:rguests.value,
+    seat:rseat.value,
+    note:rnote.value
+
+  };
+
+  show('payment');
+}
+
+
+function payment(){
+
+  let total =
+    cart.reduce(
+      (a,x) =>
+        a + foods.find(f => f.id === x.id).p * x.q,
+      0
+    );
+
+  document.getElementById('main').innerHTML = `
+
+    <div class="steps">
+
+      <div class="step active">
+        1. Menu & Order
+      </div>
+
+      <div class="step active">
+        2. Reservation
+      </div>
+
+      <div class="step active">
+        3. Payment
+      </div>
+
+    </div>
+
+
+    <div class="panel">
+
+      <div class="section-title">
+
+        <div>
+
+          <h2>
+            Payment
+          </h2>
+
+          <p>
+            Securely confirm your restaurant booking.
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <div class="summary">
+
+        <b>
+          Reservation
+        </b>
+
+        <p>
+          ${
+            reservation.name || 'Guest'
+          }
+          ·
+          ${
+            reservation.date || 'Not set'
+          }
+          ·
+          ${
+            reservation.time || 'Not set'
+          }
+          ·
+          ${
+            reservation.guests || '2 Guests'
+          }
+          ·
+          ${
+            reservation.seat || 'Indoor'
+          }
+        </p>
+
+        <b>
+          Order Total: ${money(total)}
+        </b>
+
+      </div>
+
+
+      <div
+        class="formgrid"
+        style="margin-top:18px"
+      >
+
+        <div class="field full">
+
+          <label>
+            PAYMENT METHOD
+          </label>
+
+          <select id="pm">
+
+            <option>
+              GCash
+            </option>
+
+            <option>
+              Credit / Debit Card
+            </option>
+
+            <option>
+              Cash on Arrival
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            ACCOUNT / CARD NAME
+          </label>
+
+          <input
+            id="pname"
+            placeholder="Juan Dela Cruz"
+          >
+
+        </div>
+
+
+        <div class="field">
+
+          <label>
+            REFERENCE / LAST 4 DIGITS
+          </label>
+
+          <input
+            id="pref"
+            placeholder="Optional for prototype"
+          >
+
+        </div>
+
+      </div>
+
+
+      <div class="msg error" id="payMsg"></div>
+
+      ${
+        currentUser
+        ? `
+          <button
+            class="primary"
+            style="margin-top:20px"
+            id="payBtn"
+            onclick="confirmPayment()"
+          >
+            Confirm Booking & Payment
+          </button>
+        `
+        : `
+          <p class="desc" style="margin-top:20px">
+            Please log in or create a customer account to confirm your booking.
+          </p>
+          <button
+            class="primary"
+            onclick="afterLogin='payment';show('login')"
+          >
+            Log in to Confirm Booking
+          </button>
+        `
+      }
+
+    </div>
+
+  `;
+}
+
+
+async function confirmPayment(){
+
+  if(!currentUser){
+    afterLogin = 'payment';
+    show('login');
+    return;
+  }
+
+  if(!reservation.date){
+    show('reserve');
+    return;
+  }
+
+  let btn = document.getElementById('payBtn');
+  let msg = document.getElementById('payMsg');
+  btn.disabled = true;
+  btn.textContent = 'Confirming…';
+
+  let saved;
+
+  try{
+    saved = await api('/api/reservations', {
+      method:'POST',
+      body:JSON.stringify({
+        ...reservation,
+        seating:reservation.seat,
+        paymentMethod:pm.value,
+        items:cart
+      })
+    });
+  }catch(err){
+    msg.textContent = err.message;
+    msg.classList.add('show');
+    btn.disabled = false;
+    btn.textContent = 'Confirm Booking & Payment';
+    return;
+  }
+
+  let ref = saved.ref;
+
+  document.getElementById('main').innerHTML = `
+
+    <div class="panel success">
+
+      <div class="icon">
+        ✓
+      </div>
+
+      <div class="eyebrow">
+        Booking confirmed
+      </div>
+
+      <h2>
+        You're all set!
+      </h2>
+
+      <p>
+        Your table at Kennies is reserved for
+        <b>${esc(reservation.date)}</b>
+        at
+        <b>${esc(reservation.time)}</b>
+        for
+        <b>${esc(reservation.guests)}</b>.
+      </p>
+
+      <p>
+        Confirmation code:
+        <b>${ref}</b>
+      </p>
+
+      <div style="display:flex;gap:10px;justify-content:center">
+
+        <button
+          class="primary"
+          onclick="show('account')"
+        >
+          View My Bookings
+        </button>
+
+        <button
+          class="ghost"
+          onclick="show('home')"
+        >
+          Back to Home
+        </button>
+
+      </div>
+
+    </div>
+
+  `;
+
+  cart = [];
+  reservation = {};
+
+  save();
+}
+
+
+/* ---------- Accounts ---------- */
+
+function setMsg(id, text, type = 'error'){
+  let el = document.getElementById(id);
+  if(!el) return;
+  el.textContent = text;
+  el.className = 'msg show ' + type;
+}
+
+
+function authErrorText(err){
+  let A = window.KAuth;
+  if(A && err instanceof A.MissingIdentityError)
+    return 'Accounts are not available right now. Please try again later.';
+  if(A && err instanceof A.AuthError){
+    if(err.status === 401) return 'Invalid email or password.';
+    if(err.status === 403) return 'New signups are currently closed.';
+    if(err.status === 422) return 'Please check your email and use a password of at least 6 characters.';
+    return err.message;
+  }
+  return err.message || 'Something went wrong. Please try again.';
+}
+
+
+function loginPage(tab = 'login'){
+
+  if(currentUser && tab !== 'reset' && tab !== 'invite'){
+    show('account');
+    return;
+  }
+
+  let forms = {
+
+    login: `
+      <form class="stack" onsubmit="doLogin(event)">
+        <div class="field">
+          <label>EMAIL</label>
+          <input id="lemail" type="email" required autocomplete="email">
+        </div>
+        <div class="field">
+          <label>PASSWORD</label>
+          <input id="lpass" type="password" required autocomplete="current-password">
+        </div>
+        <button class="primary" id="authBtn">Log in</button>
+        <button type="button" class="link" onclick="loginPage('forgot')">Forgot your password?</button>
+      </form>
+    `,
+
+    signup: `
+      <form class="stack" onsubmit="doSignup(event)">
+        <div class="field">
+          <label>FULL NAME</label>
+          <input id="sname" required autocomplete="name" placeholder="Juan Dela Cruz">
+        </div>
+        <div class="field">
+          <label>EMAIL</label>
+          <input id="semail" type="email" required autocomplete="email" placeholder="juan@email.com">
+        </div>
+        <div class="field">
+          <label>PASSWORD</label>
+          <input id="spass" type="password" required minlength="6" autocomplete="new-password">
+        </div>
+        <button class="primary" id="authBtn">Create customer account</button>
+      </form>
+    `,
+
+    forgot: `
+      <form class="stack" onsubmit="doForgot(event)">
+        <p class="desc">Enter your email and we'll send you a link to reset your password.</p>
+        <div class="field">
+          <label>EMAIL</label>
+          <input id="femail" type="email" required autocomplete="email">
+        </div>
+        <button class="primary" id="authBtn">Send reset link</button>
+        <button type="button" class="link" onclick="loginPage('login')">Back to log in</button>
+      </form>
+    `,
+
+    reset: `
+      <form class="stack" onsubmit="doReset(event)">
+        <p class="desc">Choose a new password for your account.</p>
+        <div class="field">
+          <label>NEW PASSWORD</label>
+          <input id="npass" type="password" required minlength="6" autocomplete="new-password">
+        </div>
+        <button class="primary" id="authBtn">Save new password</button>
+      </form>
+    `,
+
+    invite: `
+      <form class="stack" onsubmit="doInvite(event)">
+        <p class="desc">You've been invited to Kennies. Set a password to activate your account.</p>
+        <div class="field">
+          <label>PASSWORD</label>
+          <input id="ipass" type="password" required minlength="6" autocomplete="new-password">
+        </div>
+        <button class="primary" id="authBtn">Activate account</button>
+      </form>
+    `
+
+  };
+
+  let titles = {
+    login:'Welcome back',
+    signup:'Create an account',
+    forgot:'Reset password',
+    reset:'Set a new password',
+    invite:'Accept invitation'
+  };
+
+  document.getElementById('main').innerHTML = `
+
+    <div class="auth-wrap">
+
+      <div class="panel">
+
+        <div class="eyebrow">Kennies account</div>
+        <h2 style="font:700 30px Georgia,serif;margin:6px 0 18px">${titles[tab]}</h2>
+
+        ${
+          tab === 'login' || tab === 'signup'
+          ? `
+            <div class="tabs">
+              <button class="${tab === 'login' ? 'active' : ''}" onclick="loginPage('login')">Log in</button>
+              <button class="${tab === 'signup' ? 'active' : ''}" onclick="loginPage('signup')">Sign up</button>
+            </div>
+          `
+          : ''
+        }
+
+        <div class="msg" id="authMsg" style="margin-bottom:14px"></div>
+
+        ${forms[tab]}
+
+      </div>
+
+      <p class="desc" style="text-align:center">
+        Staff (managers and admins) log in here with the account an admin gave them.
+      </p>
+
+    </div>
+
+  `;
+}
+
+
+async function withAuthBtn(label, fn){
+  let btn = document.getElementById('authBtn');
+  let original = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = label;
+  try{
+    await fn();
+  }catch(err){
+    setMsg('authMsg', authErrorText(err));
+  }finally{
+    if(document.body.contains(btn)){
+      btn.disabled = false;
+      btn.textContent = original;
+    }
+  }
+}
+
+
+function doLogin(e){
+  e.preventDefault();
+  withAuthBtn('Logging in…', async () => {
+    let user = await KAuth.login(lemail.value.trim(), lpass.value);
+    setUser(user);
+    goAfterLogin();
+  });
+}
+
+
+function doSignup(e){
+  e.preventDefault();
+  withAuthBtn('Creating account…', async () => {
+    let user = await KAuth.signup(semail.value.trim(), spass.value, { full_name:sname.value.trim() });
+    if(user.emailVerified){
+      setUser(user);
+      goAfterLogin();
+    }else{
+      setMsg('authMsg', 'Almost there! Check your email to confirm your account, then log in.', 'ok');
+    }
+  });
+}
+
+
+function doForgot(e){
+  e.preventDefault();
+  withAuthBtn('Sending…', async () => {
+    await KAuth.requestPasswordRecovery(femail.value.trim());
+    setMsg('authMsg', 'If that email has an account, a reset link is on its way.', 'ok');
+  });
+}
+
+
+function doReset(e){
+  e.preventDefault();
+  withAuthBtn('Saving…', async () => {
+    let user = await KAuth.updateUser({ password:npass.value });
+    setUser(user);
+    show('account');
+  });
+}
+
+
+function doInvite(e){
+  e.preventDefault();
+  withAuthBtn('Activating…', async () => {
+    let user = await KAuth.acceptInvite(pendingInviteToken, ipass.value);
+    pendingInviteToken = null;
+    setUser(user);
+    goAfterLogin();
+  });
+}
+
+
+async function doLogout(){
+  try{
+    await KAuth.logout();
+  }catch(err){}
+  setUser(null);
+  show('home');
+}
+
+
+function goAfterLogin(){
+  let role = roleOf(currentUser);
+  let next = afterLogin || (role === 'admin' ? 'admin' : role === 'manager' ? 'manager' : 'account');
+  afterLogin = null;
+  show(next);
+}
+
+
+function setUser(user){
+
+  currentUser = user;
+
+  let btn = document.getElementById('accountBtn');
+
+  btn.innerHTML = user
+    ? `${esc((user.name || user.email || '').split(' ')[0].split('@')[0])}<small>${roleOf(user)}</small>`
+    : 'Log in';
+
+  renderNav();
+}
+
+
+function renderNav(){
+
+  let pages = ['home','menu','order','reserve'];
+  let role = roleOf(currentUser);
+
+  if(currentUser) pages.push('account');
+  if(currentUser && (role === 'manager' || role === 'admin')) pages.push('manager');
+  if(currentUser && role === 'admin') pages.push('admin');
+
+  let labels = {
+    home:'Home',
+    menu:'Menu',
+    order:'Order',
+    reserve:'Reserve',
+    account:'My Bookings',
+    manager:'Bookings Desk',
+    admin:'Admin'
+  };
+
+  let active = document.querySelector('nav button.active')?.dataset.page;
+
+  document.getElementById('nav').innerHTML = pages.map(x => `
+    <button
+      data-page="${x}"
+      class="${x === active ? 'active' : ''}"
+      onclick="show('${x}')"
+    >
+      ${labels[x]}
+    </button>
+  `).join('');
+}
+
+
+function requireRole(roles){
+  if(!currentUser){
+    loginPage('login');
+    return false;
+  }
+  if(!roles.includes(roleOf(currentUser))){
+    document.getElementById('main').innerHTML = `
+      <div class="empty">
+        <h3>Staff only</h3>
+        <p>Your account doesn't have access to this page.</p>
+        <button class="primary" onclick="show('home')">Back to Home</button>
+      </div>
+    `;
+    return false;
+  }
+  return true;
+}
+
+
+function itemsText(items){
+  return (items || []).map(i => `${i.qty}× ${esc(i.name)}`).join(', ') || 'Table only';
+}
+
+
+async function loadBookings(){
+  document.getElementById('bookingList').innerHTML =
+    '<p class="desc">Loading bookings…</p>';
+  try{
+    bookings = await api('/api/reservations');
+  }catch(err){
+    document.getElementById('bookingList').innerHTML =
+      `<div class="msg error show">${esc(err.message)}</div>`;
+    return false;
+  }
+  return true;
+}
+
+
+/* ---------- Customer ---------- */
+
+async function account(){
+
+  if(!requireRole(['customer','manager','admin'])) return;
+
+  let role = roleOf(currentUser);
+
+  document.getElementById('main').innerHTML = `
+
+    <div class="section-title">
+      <div>
+        <h2>Hi, ${esc(currentUser.name || currentUser.userMetadata?.full_name || currentUser.email)}</h2>
+        <p>${esc(currentUser.email)} · <span class="pill">${role}</span></p>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="primary" onclick="show('reserve')">New Booking</button>
+        <button class="ghost" onclick="doLogout()">Log out</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3 style="margin-top:0">My bookings</h3>
+      <div id="bookingList"></div>
+    </div>
+
+  `;
+
+  if(!(await loadBookings())) return;
+
+  let mine = bookings.filter(b => b.userId === currentUser.id);
+
+  document.getElementById('bookingList').innerHTML = mine.length
+    ? mine.map(b => `
+        <div class="itemline">
+          <div>
+            <b>${esc(b.date)} · ${esc(b.time)}</b>
+            <div class="desc">
+              ${esc(b.guests)} · ${esc(b.seating)} · ${itemsText(b.items)}<br>
+              Ref ${esc(b.ref)} · ${money(b.total)} · ${esc(b.paymentMethod)}
+            </div>
+          </div>
+          <div class="qty">
+            <span class="pill ${esc(b.status)}">${esc(b.status)}</span>
+            ${
+              ['pending','confirmed'].includes(b.status)
+              ? `<button class="ghost" style="width:auto;height:auto" onclick="cancelBooking(${b.id})">Cancel</button>`
+              : ''
+            }
+          </div>
+        </div>
+      `).join('')
+    : `<div class="empty">
+         <h3>No bookings yet</h3>
+         <p>Reserve a table and it will show up here.</p>
+         <button class="primary" onclick="show('reserve')">Reserve a Table</button>
+       </div>`;
+}
+
+
+async function cancelBooking(id){
+  if(!confirm('Cancel this booking?')) return;
+  try{
+    await api(`/api/reservations/${id}`, { method:'PATCH', body:JSON.stringify({ status:'cancelled' }) });
+  }catch(err){
+    alert(err.message);
+  }
+  account();
+}
+
+
+/* ---------- Manager ---------- */
+
+async function managerPage(){
+
+  if(!requireRole(['manager','admin'])) return;
+
+  document.getElementById('main').innerHTML = `
+
+    <div class="section-title">
+      <div>
+        <h2>Bookings Desk</h2>
+        <p>Review and update every reservation.</p>
+      </div>
+      <button class="ghost" onclick="managerPage()">Refresh</button>
+    </div>
+
+    <div class="stats" id="bookingStats"></div>
+
+    <div class="filters" id="bookingFilters"></div>
+
+    <div class="panel">
+      <div id="bookingList"></div>
+    </div>
+
+  `;
+
+  if(!(await loadBookings())) return;
+
+  renderBookings();
+}
+
+
+function renderBookings(){
+
+  let today = new Date().toISOString().slice(0,10);
+  let active = bookings.filter(b => b.status !== 'cancelled');
+
+  document.getElementById('bookingStats').innerHTML = [
+    ['Today', active.filter(b => b.date === today).length],
+    ['Upcoming', active.filter(b => b.date >= today && b.status !== 'completed').length],
+    ['Pending', bookings.filter(b => b.status === 'pending').length],
+    ['Revenue', money(active.reduce((a,b) => a + b.total, 0))]
+  ].map(([l,v]) => `
+    <div class="stat"><div class="label">${l}</div><div class="value">${v}</div></div>
+  `).join('');
+
+  document.getElementById('bookingFilters').innerHTML = ['all','today',...STATUSES].map(x => `
+    <button
+      class="filter ${bookingFilter === x ? 'active' : ''}"
+      onclick="bookingFilter='${x}';renderBookings()"
+      style="text-transform:capitalize"
+    >
+      ${x}
+    </button>
+  `).join('');
+
+  let list = bookings.filter(b =>
+    bookingFilter === 'all' ||
+    (bookingFilter === 'today' ? b.date === today : b.status === bookingFilter)
+  );
+
+  document.getElementById('bookingList').innerHTML = list.length
+    ? `
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>When</th><th>Guest</th><th>Party</th><th>Order</th><th>Total</th><th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${list.map(b => `
+              <tr>
+                <td><b>${esc(b.date)}</b><br><span class="desc">${esc(b.time)}</span></td>
+                <td>${esc(b.name)}<br><span class="desc">${esc(b.email)}</span></td>
+                <td>${esc(b.guests)}<br><span class="desc">${esc(b.seating)}</span></td>
+                <td>${itemsText(b.items)}${b.note ? `<br><span class="desc">“${esc(b.note)}”</span>` : ''}</td>
+                <td>${money(b.total)}<br><span class="desc">${esc(b.paymentMethod)} · ${esc(b.ref)}</span></td>
+                <td>
+                  <select onchange="setStatus(${b.id}, this.value)">
+                    ${STATUSES.map(s => `<option value="${s}" ${s === b.status ? 'selected' : ''}>${s}</option>`).join('')}
+                  </select>
+                </td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    `
+    : '<div class="empty"><h3>No bookings here</h3><p>Try a different filter.</p></div>';
+}
+
+
+async function setStatus(id, status){
+  try{
+    let row = await api(`/api/reservations/${id}`, { method:'PATCH', body:JSON.stringify({ status }) });
+    bookings = bookings.map(b => b.id === id ? row : b);
+  }catch(err){
+    alert(err.message);
+  }
+  renderBookings();
+}
+
+
+/* ---------- Admin ---------- */
+
+async function adminPage(){
+
+  if(!requireRole(['admin'])) return;
+
+  document.getElementById('main').innerHTML = `
+
+    <div class="section-title">
+      <div>
+        <h2>Admin</h2>
+        <p>Manage who can access the customer, manager and admin areas.</p>
+      </div>
+      <button class="primary" onclick="show('manager')">Open Bookings Desk</button>
+    </div>
+
+    <div class="stats" id="userStats"></div>
+
+    <div class="panel">
+      <h3 style="margin-top:0">Users &amp; roles</h3>
+      <p class="desc">Role changes apply the next time that person logs in.</p>
+      <div id="userList"><p class="desc">Loading users…</p></div>
+    </div>
+
+  `;
+
+  try{
+    staffUsers = await api('/api/users');
+  }catch(err){
+    document.getElementById('userList').innerHTML =
+      `<div class="msg error show">${esc(err.message)}</div>`;
+    return;
+  }
+
+  renderUsers();
+}
+
+
+function renderUsers(){
+
+  let count = r => staffUsers.filter(u => u.roles.includes(r)).length;
+
+  document.getElementById('userStats').innerHTML = [
+    ['Users', staffUsers.length],
+    ['Customers', count('customer')],
+    ['Managers', count('manager')],
+    ['Admins', count('admin')]
+  ].map(([l,v]) => `
+    <div class="stat"><div class="label">${l}</div><div class="value">${v}</div></div>
+  `).join('');
+
+  document.getElementById('userList').innerHTML = `
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>User</th><th>Joined</th><th>Last login</th><th>Role</th></tr>
+        </thead>
+        <tbody>
+          ${staffUsers.map(u => `
+            <tr>
+              <td><b>${esc(u.name || '—')}</b><br><span class="desc">${esc(u.email)}</span></td>
+              <td>${u.createdAt ? esc(new Date(u.createdAt).toLocaleDateString()) : '—'}</td>
+              <td>${u.lastSignInAt ? esc(new Date(u.lastSignInAt).toLocaleDateString()) : '—'}</td>
+              <td>
+                <select onchange="setRole('${esc(u.id)}', this.value)" ${u.id === currentUser.id ? 'disabled' : ''}>
+                  ${['customer','manager','admin'].map(r => `
+                    <option value="${r}" ${u.roles.includes(r) ? 'selected' : ''}>${r}</option>
+                  `).join('')}
+                </select>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+
+async function setRole(id, role){
+  try{
+    let updated = await api(`/api/users/${encodeURIComponent(id)}`, { method:'PATCH', body:JSON.stringify({ role }) });
+    staffUsers = staffUsers.map(u => u.id === id ? { ...u, roles:updated.roles } : u);
+  }catch(err){
+    alert(err.message);
+  }
+  renderUsers();
+}
+
+
+/* ---------- Startup ---------- */
+
+async function initAuth(){
+
+  let A = window.KAuth;
+
+  try{
+    let result = await A.handleAuthCallback();
+    if(result?.type === 'recovery'){
+      setUser(result.user);
+      loginPage('reset');
+      return;
+    }
+    if(result?.type === 'invite'){
+      pendingInviteToken = result.token;
+      loginPage('invite');
+      return;
+    }
+    if(result?.user){
+      setUser(result.user);
+      goAfterLogin();
+      return;
+    }
+  }catch(err){
+    console.warn(err);
+  }
+
+  setUser(await A.getUser());
+
+  A.onAuthChange((event, user) => {
+    if(event === 'logout') setUser(null);
+    else if(user) setUser(user);
+  });
+}
+
+
+renderNav();
+
+
+save();
+
+show('home');
+
+if(window.KAuth) initAuth();
+else window.addEventListener('kauth:ready', initAuth, { once:true });
+
+</script>
+
+</body>
+</html>
