@@ -1,0 +1,26 @@
+# Base44 sandbox environment for this repository.
+#
+# The project is a static site: netlify.toml publishes
+# `deploy-6ae1ec6b5f4c161d122f9211`, which contains index.html and auth.js.
+# There is no build step, so nginx serves those files straight from the
+# bind-mounted checkout — editing them is visible on the next page load.
+services:
+  web:
+    image: nginx:alpine
+    ports:
+      - "3000:80"
+    volumes:
+      - ./deploy-6ae1ec6b5f4c161d122f9211:/usr/share/nginx/html:ro
+    environment:
+      - BASE44_PREVIEW_MODE
+    restart: on-failure
+    labels:
+      base44.project: Kennies Booking
+      base44.kind: web
+      base44.port: "3000"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1/index.html"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
