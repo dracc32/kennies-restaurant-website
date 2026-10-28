@@ -227,8 +227,18 @@ main{
   height:150px;
   display:grid;
   place-items:center;
+  position:relative;
   font-size:55px;
+  overflow:hidden;
   background:linear-gradient(135deg,#3b3028,#61493a)
+}
+
+.food-img img{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover
 }
 
 .card-body{
@@ -735,6 +745,7 @@ const foods = [
   c:'Pasta',
   p:310,
   e:'🍝',
+  img:'https://images.unsplash.com/photo-1473093295043-cdd812d0e601?auto=format&fit=crop&w=800&q=80',
   d:'Creamy parmesan sauce with bacon and a touch of black pepper.'
 },
 
@@ -744,6 +755,7 @@ const foods = [
   c:'Drinks',
   p:190,
   e:'🍵',
+  img:'https://images.unsplash.com/photo-1515823064-d6e0c04616a7?auto=format&fit=crop&w=800&q=80',
   d:'Smooth Japanese matcha blended with milk and served over ice.'
 },
 
@@ -753,6 +765,7 @@ const foods = [
   c:'Pasta',
   p:335,
   e:'🍝',
+  img:'https://images.unsplash.com/photo-1574894709920-11b28e7367e3?auto=format&fit=crop&w=800&q=80',
   d:'Layers of slow-cooked beef ragu, pasta, bechamel and cheese.'
 },
 
@@ -762,6 +775,7 @@ const foods = [
   c:'Pizza',
   p:355,
   e:'🍕',
+  img:'https://images.unsplash.com/photo-1579751626657-72bc17010498?auto=format&fit=crop&w=800&q=80',
   d:'Mozzarella, parmesan, cheddar and blue cheese on a crisp crust.'
 },
 
@@ -771,6 +785,7 @@ const foods = [
   c:'Mains',
   p:420,
   e:'🐟',
+  img:'https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=800&q=80',
   d:'Grilled salmon with lemon butter and seasonal vegetables.'
 },
 
@@ -780,6 +795,7 @@ const foods = [
   c:'Mains',
   p:390,
   e:'🥩',
+  img:'https://images.unsplash.com/photo-1546833999-b9f581a1996d?auto=format&fit=crop&w=800&q=80',
   d:'Tender beef steak served with fragrant garlic rice.'
 },
 
@@ -789,6 +805,7 @@ const foods = [
   c:'Mains',
   p:325,
   e:'🍟',
+  img:'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&w=800&q=80',
   d:'Golden battered fish with crispy fries and tartar sauce.'
 },
 
@@ -798,6 +815,7 @@ const foods = [
   c:'Dessert',
   p:195,
   e:'🍰',
+  img:'https://images.unsplash.com/photo-1533134242443-d4fd215305ad?auto=format&fit=crop&w=800&q=80',
   d:'Creamy cheesecake topped with ripe mango and a buttery crust.'
 },
 
@@ -807,6 +825,7 @@ const foods = [
   c:'Pasta',
   p:315,
   e:'🍝',
+  img:'https://images.unsplash.com/photo-1551183053-bf91a1d81141?auto=format&fit=crop&w=800&q=80',
   d:'Grilled chicken tossed with basil pesto, parmesan and pasta.'
 },
 
@@ -816,6 +835,7 @@ const foods = [
   c:'Drinks',
   p:175,
   e:'☕',
+  img:'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?auto=format&fit=crop&w=800&q=80',
   d:'Espresso and creamy milk sweetened with condensed milk.'
 }
 
@@ -993,6 +1013,7 @@ function foodCard(f){
 
       <div class="food-img">
         ${f.e}
+        ${f.img ? `<img src="${f.img}" alt="${esc(f.n)}" loading="lazy" onerror="this.style.display='none'">` : ''}
       </div>
 
       <div class="card-body">
